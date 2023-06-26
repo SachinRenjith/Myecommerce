@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+    
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <h4 class="text-center mb-10 ">Review Your Order and Make Payment </h4>
+    <div class="row">
+       
+        <aside class="col-lg-8">
+            <div class="card">
+                <h5 class="card-header">Billing Address</h5>
+                <div class="card-body">  
+                  <p class="card-text mb-0 ">{{ order.full_name }}   </p> 
+                  <p class="card-text mb-0 ">{{ order.full_address}}   </p> 
+                  <p class="card-text mb-0 ">{{ order.city }}, {{ order.state }}   </p> 
+                  <p class="card-text mb-0 ">{{ order.email }}   </p> 
+                  <p class="card-text mb-0 ">{{ order.phone_number }}   </p> 
+                  
+
+                  {% if order.order_note %}
+                    <b>Order Note:</b> {{ order.order_note }}   
+                   {% endif %}        
+                </div>
+              </div>
+              <div class="card">
+                <h5 class="card-header">Payment Method</h5>
+                <div class="card-body">  
+                  <p class="card-text">Razor pay</p>               
+                </div>
+              </div>
+              <div class="card">
+                <h5 class="card-header">Review Product</h5>
+                <div class="card-body">  
+                    <table class="table table-borderless table-shopping-cart">
+                        <thead class="text-muted">
+                        <tr class="small text-uppercase">
+                          <th scope="col">Product</th>
+                          <th scope="col" width="120">Quantity</th>
+                          <th scope="col" width="120">Price</th>
+                         
+                        </tr>
+                        </thead>
+                        <tbody>
+                       {% for cart_item in cart_items %}     
+                        <tr>
+                            <td>
+                                <figure class="itemside align-items-center">
+                                    <div class="aside"><img src="{{ cart_item.product.images.url }}" class="img-sm"></div>
+                                    <figcaption class="info">
+                                        <a href="{{ cart_item.product.get_url }}" class="title text-dark">{{ cart_item.product.product_name}}</a>
+                                        <p class="text-muted small">Color: 25 Mpx <br> Size: Canon</p>
+                                    </figcaption>
+                                </figure>
+                            </td>
+                            <td> 
+                                <!-- col.// -->
+                                            
+                            </td>
+                            <td> 
+                                <div class="price-wrap"> 
+                                    <var class="price">₹{{ cart_item.sub_total }}</var> 
+                                    <small class="text-muted"> ₹{{ cart_item.product.price }} </small> 
+                                </div> <!-- price-wrap .// -->
+                            </td>
+                            
+                        </tr>
+                       {% endfor %}  
+                         
+                        </tbody>
+                        </table>               
+                </div>
+              </div> <!-- card.// -->
+    
+        </aside> <!-- col.// -->
+        <aside class="col-lg-4">
+    
+            <div class="card">
+            <div class="card-body">
+                <dl class="dlist-align">
+                  <dt>Total price:</dt>
+                  <dd class="text-right">₹{{ total }}</dd>
+                </dl>
+                <dl class="dlist-align">
+                  <dt>Tax:</dt>
+                  <dd class="text-right">₹{{ tax }}</dd>
+                </dl>
+                <dl class="dlist-align">
+                  <dt>Grand Total:</dt>
+                  <dd class="text-right text-dark b"><strong>₹{{ grand_total }}</strong></dd>
+                </dl>
+                <hr>
+                <p class="text-center mb-3">
+                    <img src="{% static './images/misc/payments.png' %}" height="26">
+                </p>
+                <button href="{% url 'checkout' %}" class="btn btn-primary btn-block" id="rzp-button1"> Make Payment </button>
+                
+            </div> <!-- card-body.// -->
+            </div> <!-- card.// -->
+    
+    </aside> <!-- col.// -->
+    
+    
+    </div> <!-- row.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+      
+    </div> <!-- container .//  -->
+    </section>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+      var options = {
+          "key": "rzp_test_dOXNLDWadAgvTr", // Enter the Key ID generated from the Dashboard
+          "amount": "{{grand_total}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+          "currency": "INR",
+          "name": "Ride'n'Drive",
+          "description": "Purchase Transaction",
+          "image": "https://example.com/your_logo",
+          "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+          "handler": function (response){
+            var razorpay_payment_id = response.razorpay_payment_id;
+            var razorpay_order_id = response.razorpay_order_id;
+      
+            var redirectUrl = 'http://127.0.0.1:8000/orderss/success/?razorpay_payment_id=' + razorpay_payment_id + '&razorpay_order_id=' + razorpay_order_id + '&amount_paid=' + {{grand_total}};
+            window.location.href = redirectUrl;
+              
+          },
+          
+          "theme": {
+              "color": "#3399cc"
+          }
+      };
+      var rzp1 = new Razorpay(options);
+      rzp1.on('payment.failed', function (response){
+              alert(response.error.code);
+              alert(response.error.description);
+              alert(response.error.source);
+              alert(response.error.step);
+              alert(response.error.reason);
+              alert(response.error.metadata.order_id);
+              alert(response.error.metadata.payment_id);
+      });
+      document.getElementById('rzp-button1').onclick = function(e){
+          rzp1.open();
+          e.preventDefault();
+      }
+      </script>
+
+
+{% endblock %}
