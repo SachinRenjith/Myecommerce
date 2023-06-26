@@ -43,7 +43,7 @@ class Account(AbstractBaseUser):
     username       = models.CharField(max_length=50, unique=True)
     email          = models.EmailField(unique=True)
     phone_number   = models.CharField(max_length=10)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    
 
     # requred fields
     date_joined    =models.DateTimeField(auto_now_add=True)

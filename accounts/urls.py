@@ -13,6 +13,6 @@ urlpatterns = [
     path('resetPassword/',views.resetPassword, name='resetPassword'), 
 
     path('dashboard/', views.dashboard, name='dashboard'), 
-    path('edit_profile',views.edit_user_details, name='edit_profile'),
+    path('edit_profile/',views.edit_user_profile, name='edit_profile'),
     path('change_password',views.change_password,name='change_password'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

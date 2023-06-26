@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 import datetime
-from carts.models import CartItem
+from carts.models import CartItem, Cart
 from .forms import OrderForm
 from .models import Payment,Order
 import razorpay
 from django.conf import settings
-
+from django.http import HttpResponse
 # Create your views here.
 def place_order(request, total=0, quantity=0):
     current_user = request.user
@@ -85,3 +85,30 @@ def place_order(request, total=0, quantity=0):
      
 def payment(request):
     return render(request,'orders/payment.html')    
+
+def success(request):
+    razorpay_order_id = request.GET.get('razorpay_order_id')
+    razorpay_payment_id = request.GET.get('razorpay_payment_id')
+    amount_paid = request.GET.get('amount_paid')
+
+    print("razorpay_order_id:", razorpay_order_id)
+    print("razorpay_payment_id:", razorpay_payment_id)
+    print("amount_paid:", amount_paid)
+
+    try:
+        payment = Payment.objects.create(
+            user=request.user,
+            razorpay_payment_id=razorpay_payment_id,
+            razorpay_order_id=razorpay_order_id,
+            amount_paid=amount_paid,
+        )
+
+        # # Get the corresponding order based on the order_id
+        # order = Order.objects.get(order_number=order_id)
+        # order.payment = payment  # Assign the payment to the order's payment field
+        # order.is_ordered = True  # Mark the order as paid/ordered
+        # order.save()
+
+        return HttpResponse('Payment Success!!!!!!')
+    except Payment.DoesNotExist:
+        return HttpResponse('Payment not found')

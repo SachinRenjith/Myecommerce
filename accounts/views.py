@@ -17,6 +17,8 @@ from carts.models import Cart, CartItem
 from .forms import EditUserForm
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from orderss.models import Order
+from .forms import EditUserForm
 # Create your views here.
 def register(request):
      if request.user.is_authenticated:
@@ -156,22 +158,28 @@ def resetPassword(request):
     
 
 def dashboard(request):
-    
-    return render(request, 'accounts/dashboard.html')  
+    orders = Order.objects.order_by('created_at').filter(user_id=request.user.id,is_ordered=True)
+    orders_count = orders.count
+    context={
+        'orders_count':orders_count,
+    }
+    return render(request, 'accounts/dashboard.html',context)  
 
-
-def edit_user_details(request):
-    user = request.user
+def edit_user_profile(request):
     if request.method == 'POST':
-        form = EditUserForm(request.POST, instance=user)
+        form = EditUserForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('dashboard')  # Redirect to dashboard or any other page
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('dashboard')  # Replace 'dashboard' with the appropriate URL name for your dashboard view
     else:
-        form = EditUserForm(instance=user)
+        form = EditUserForm(instance=request.user)
     
-    context = {'form': form}
-    return render(request, 'accounts/edit_user_details.html', context)
+    return render(request, 'accounts/edit_user_details.html', {'form': form})
+
+
+
+  
 
 
 def change_password(request):
@@ -184,7 +192,7 @@ def change_password(request):
             update_session_auth_hash(request, user)
             messages.success(request, 'Your password has been changed successfully.')
             
-            return redirect('dashboard')  # Redirect to dashboard or any other page
+            return redirect('change_password')  # Redirect to dashboard or any other page
     else:
         form = PasswordChangeForm(request.user)
     

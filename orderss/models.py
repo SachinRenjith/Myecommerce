@@ -5,10 +5,10 @@ from store.models import Product
 
 class Payment(models.Model):
     user                = models.ForeignKey(Account, on_delete=models.CASCADE)
-    payment_id          = models.CharField(max_length=100)
-    order_id            = models.CharField(max_length=100)
+    razorpay_payment_id          = models.CharField(max_length=100)
+    razorpay_order_id            = models.CharField(max_length=100)
     amount_paid         = models.CharField(max_length=100) # this is the total amount
-    status              = models.CharField(max_length=100)
+    razor_pay_status              = models.CharField(max_length=100)
     created_at          = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
