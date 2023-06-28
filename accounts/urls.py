@@ -15,4 +15,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'), 
     path('edit_profile/',views.edit_user_profile, name='edit_profile'),
     path('change_password',views.change_password,name='change_password'),
+    path('my_orders/',views.my_orders, name='my_orders'),
+    path('order_detail/<int:order_id>/',views.order_detail, name='order_detail'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

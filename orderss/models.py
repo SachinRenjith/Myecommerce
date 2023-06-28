@@ -40,7 +40,7 @@ class Order(models.Model):
         tax = models.FloatField()
         status = models.CharField(max_length=10, choices=STATUS,default='New')
         ip = models.CharField(blank=True, max_length=50)
-        is_ordered = models.BooleanField(default=False)
+        is_ordered = models.BooleanField(default=True)
         created_at =models.DateTimeField(auto_now_add=True)
         updated_at = models.DateTimeField(auto_now=True)
 

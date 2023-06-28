@@ -2,22 +2,23 @@ from django.shortcuts import render, redirect
 import datetime
 from carts.models import CartItem, Cart
 from .forms import OrderForm
-from .models import Payment,Order
+from .models import Payment,Order,OrderProduct
 import razorpay
 from django.conf import settings
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 def place_order(request, total=0, quantity=0):
     current_user = request.user
-    print(current_user)
+     
     # cart_items = CartItem.objects.filter(user=current_user)
     cart_items = CartItem.objects.all()
     cart_count = cart_items.count()
     
     # if cart_count <= 0:
     #     return redirect('checkout')
-    print(total)
-    print(quantity)
+   
     grand_total = 0
     tax = 0
     for cart_item in cart_items:
@@ -45,7 +46,7 @@ def place_order(request, total=0, quantity=0):
             data.order_total = grand_total
             data.tax = tax
             data.ip = request.META.get('REMOTE_ADDR')
-             
+            
             data.save()
              
             # generate order number
@@ -56,19 +57,14 @@ def place_order(request, total=0, quantity=0):
             current_date =d.strftime("%Y%d%m")
             order_number = current_date + str(data.id)
             data.order_number = order_number
+            
             data.save()
-            order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-            print(cart_items)
+            order = Order.objects.get(user=current_user, is_ordered=True, order_number=order_number)
+           
 
             client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
             payment = client.order.create({'amount':int(grand_total)*100, 'currency': 'INR', 'payment_capture': 1})
-            
-            print('******')
-            print(payment)
-            print('**********')
-            print(total)
-            print(tax)
-            print(grand_total)
+           
             context ={
                 'order':order,
                 'cart_items':cart_items,
@@ -84,16 +80,30 @@ def place_order(request, total=0, quantity=0):
     
      
 def payment(request):
-    return render(request,'orders/payment.html')    
+    razorpay_order_id = request.GET.get('razorpay_order_id')
+    razorpay_payment_id = request.GET.get('razorpay_payment_id')
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    for item in cart_items:
+        orderproduct = OrderProduct()
+        orderproduct.order_id = razorpay_order_id
+        orderproduct.payment = razorpay_payment_id
+        orderproduct.user_id = request.user.id
+        orderproduct.product = item.product  # Assign the product related to the cart item
+        orderproduct.quantity = item.quantity
+        orderproduct.product_price = item.product.price
+        orderproduct.ordered = True
+        orderproduct.save()
+
+    return render(request, 'orders/payment.html')
+  
 
 def success(request):
     razorpay_order_id = request.GET.get('razorpay_order_id')
     razorpay_payment_id = request.GET.get('razorpay_payment_id')
     amount_paid = request.GET.get('amount_paid')
 
-    print("razorpay_order_id:", razorpay_order_id)
-    print("razorpay_payment_id:", razorpay_payment_id)
-    print("amount_paid:", amount_paid)
+   
 
     try:
         payment = Payment.objects.create(
@@ -102,13 +112,23 @@ def success(request):
             razorpay_order_id=razorpay_order_id,
             amount_paid=amount_paid,
         )
-
-        # # Get the corresponding order based on the order_id
-        # order = Order.objects.get(order_number=order_id)
-        # order.payment = payment  # Assign the payment to the order's payment field
-        # order.is_ordered = True  # Mark the order as paid/ordered
-        # order.save()
+         
 
         return HttpResponse('Payment Success!!!!!!')
     except Payment.DoesNotExist:
         return HttpResponse('Payment not found')
+
+
+
+def order_complete(request):
+   
+    return render (request,'orders/order_complete.html')
+   
+
+
+
+
+
+
+
+ 

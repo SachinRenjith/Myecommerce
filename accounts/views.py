@@ -201,3 +201,13 @@ def change_password(request):
 
         
      
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    print(orders)
+    context={
+        'orders':orders,
+    }
+    return render(request,'accounts/my_orders.html',context)
+
+def order_detail(request, order_id):
+    return render(request,'accounts/order_detail.html')
