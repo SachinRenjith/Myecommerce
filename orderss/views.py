@@ -80,9 +80,12 @@ def place_order(request, total=0, quantity=0):
     
      
 def payment(request):
+    print(request,'test64375899999974888888888888')
     razorpay_order_id = request.GET.get('razorpay_order_id')
     razorpay_payment_id = request.GET.get('razorpay_payment_id')
-
+    print(request.user)
+    print(razorpay_order_id)
+    print(razorpay_payment_id)
     cart_items = CartItem.objects.filter(user=request.user)
     for item in cart_items:
         orderproduct = OrderProduct()
@@ -92,7 +95,7 @@ def payment(request):
         orderproduct.product = item.product  # Assign the product related to the cart item
         orderproduct.quantity = item.quantity
         orderproduct.product_price = item.product.price
-        orderproduct.ordered = True
+        orderproduct.ordered = True 
         orderproduct.save()
 
     return render(request, 'orders/payment.html')
@@ -102,7 +105,11 @@ def success(request):
     razorpay_order_id = request.GET.get('razorpay_order_id')
     razorpay_payment_id = request.GET.get('razorpay_payment_id')
     amount_paid = request.GET.get('amount_paid')
-
+    full_name = request.GET.get('full_name')
+    full_address = request.GET.get('full_address')
+    state = request.GET.get('state')
+    city = request.GET.get('city')
+    order_number = request.GET.get('order_number')
    
 
     try:
@@ -113,16 +120,37 @@ def success(request):
             amount_paid=amount_paid,
         )
          
+        order_number = order_number
+        full_name = full_name
+        full_address = full_address
+        state = state
+        city = city
+        return redirect('order_complete')
 
-        return HttpResponse('Payment Success!!!!!!')
     except Payment.DoesNotExist:
         return HttpResponse('Payment not found')
 
 
-
 def order_complete(request):
-   
-    return render (request,'orders/order_complete.html')
+    razorpay_payment_id = request.GET.get('razorpay_payment_id')
+    order_number = request.GET.get('order_number')
+    full_name = request.GET.get('full_name')
+    address = request.GET.get('address')
+    state = request.GET.get('state')
+    city = request.GET.get('city')
+
+    context = {
+        'razorpay_payment_id': razorpay_payment_id,
+        'order_number': order_number,
+        'full_name': full_name,
+        'address': address,
+        'state': state,
+        'city': city,
+        # Add other context variables as needed
+    }
+
+    return render(request, 'orders/order_complete.html', context)
+
    
 
 
