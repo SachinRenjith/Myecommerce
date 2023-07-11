@@ -139,6 +139,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+bikers/.env
+bikers/.env/
 
 # Spyder project settings
 .spyderproject

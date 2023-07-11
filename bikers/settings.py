@@ -11,17 +11,19 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os 
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+SECRET_KEY = os.getenv('SECRET_KEY') 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-jc*al@j3ng9-+fo7m-h1$7_-9d^)3@6k9+^-2vola+)zvl^le1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,13 +86,23 @@ AUTH_USER_MODEL = 'accounts.Account'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#          'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'EcommerceDB',
+#         'USER': 'postgres',
+#         'PASSWORD':os.getenv('PASSWORD'),
+#         'HOST': 'localhost'
+#     }
+# }
 DATABASES = {
     'default': {
-         'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'EcommerceDB',
-        'USER': 'postgres',
-        'PASSWORD': 'sachin3320',
-        'HOST': 'localhost'
+        'USER': 'mysuperuser',
+        'PASSWORD': os.getenv('PASSWORD'),
+        'HOST': 'ecommercedb.cq4a59y5ypdq.eu-north-1.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
@@ -148,9 +160,10 @@ MESSAGE_TAGS = {
 # SMPT Configuration
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'sachinranjith01@gmail.com'
-EMAIL_HOST_PASSWORD = 'biolzwttjmtanmgk'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD =os.getenv('PASSWORD')
 EMAIL_USE_TLS = True
 
-RAZOR_KEY_ID = "rzp_test_dOXNLDWadAgvTr"
-RAZOR_KEY_SECRET ="DGj3YVpnWPXut5LBHd5AEuQy"
+RAZOR_KEY_ID = os.getenv('RAZOR_KEY_ID')
+
+RAZOR_KEY_SECRET = os.getenv('RAZOR_KEY_SECRET')

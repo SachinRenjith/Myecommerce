@@ -64,7 +64,8 @@ def place_order(request, total=0, quantity=0):
 
             client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
             payment = client.order.create({'amount':int(grand_total)*100, 'currency': 'INR', 'payment_capture': 1})
-           
+            
+            razorpay_id = settings.RAZOR_KEY_ID
             context ={
                 'order':order,
                 'cart_items':cart_items,
@@ -80,23 +81,32 @@ def place_order(request, total=0, quantity=0):
     
      
 def payment(request):
-    print(request,'test64375899999974888888888888')
-    razorpay_order_id = request.GET.get('razorpay_order_id')
-    razorpay_payment_id = request.GET.get('razorpay_payment_id')
-    print(request.user)
-    print(razorpay_order_id)
-    print(razorpay_payment_id)
-    cart_items = CartItem.objects.filter(user=request.user)
-    for item in cart_items:
+    print(request)
+    try:
+    # Create an order instance
+     order = Order()
+    # Assign necessary values to the order instance
+     order.user_id = request.user.id
+    # ... additional assignments if required
+     order.save()
+
+    # Move The Cart Items To Order Product Table
+     cart_items = CartItem.objects.filter(user=request.user)
+     print(cart_items)
+
+     for item in cart_items:
         orderproduct = OrderProduct()
-        orderproduct.order_id = razorpay_order_id
-        orderproduct.payment = razorpay_payment_id
+        orderproduct.order_id = order.id
+        orderproduct.payment = payment
         orderproduct.user_id = request.user.id
-        orderproduct.product = item.product  # Assign the product related to the cart item
+        orderproduct.product_id = item.product_id
         orderproduct.quantity = item.quantity
         orderproduct.product_price = item.product.price
-        orderproduct.ordered = True 
+        orderproduct.ordered = True
         orderproduct.save()
+
+    except Exception as e:  
+     print(e)
 
     return render(request, 'orders/payment.html')
   
