@@ -141,25 +141,34 @@ def success(request):
         return HttpResponse('Payment not found')
 
 
-def order_complete(request):
-    razorpay_payment_id = request.GET.get('razorpay_payment_id')
-    order_number = request.GET.get('order_number')
-    full_name = request.GET.get('full_name')
-    address = request.GET.get('address')
-    state = request.GET.get('state')
-    city = request.GET.get('city')
+from django.shortcuts import render
 
+def order_complete(request, **kwargs):
+    # Retrieve the context dictionary from the keyword arguments
+    context = kwargs.get('context', {})
+    
+    # Access the data from the context dictionary
+    order_number = context.get('order_number')
+    first_name = context.get('first_name')
+    last_name = context.get('last_name')
+    address = context.get('address_line_1')
+    city = context.get('city')
+    state = context.get('state')
+    # Add more variables as needed
+    
+    # Pass the data to the template
     context = {
-        'razorpay_payment_id': razorpay_payment_id,
         'order_number': order_number,
-        'full_name': full_name,
+        'first_name': first_name,
+        'last_name': last_name,
         'address': address,
-        'state': state,
         'city': city,
-        # Add other context variables as needed
+        'state': state,
+        # Add more variables as needed
     }
-
+    
     return render(request, 'orders/order_complete.html', context)
+
 
    
 
