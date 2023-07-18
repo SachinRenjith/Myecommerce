@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['13.51.207.222', 'bikerstore.online']
+ALLOWED_HOSTS = ['13.53.146.180', 'bikerstore.online']
 
 
 # Application definition
