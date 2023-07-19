@@ -19,7 +19,8 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY') 
+SECRET_KEY = os.getenv('SECRESECURE_SSL_REDIRECT = True
+T_KEY') 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -31,7 +32,9 @@ DEBUG = False
 ALLOWED_HOSTS = ['13.53.146.180', 'bikerstore.online']
 
 
+SECURE_SSL_REDIRECT = True
 # Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
