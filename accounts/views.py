@@ -19,7 +19,9 @@ from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from orderss.models import Order
 from .forms import EditUserForm
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
+@csrf_exempt
 def register(request):
      if request.user.is_authenticated:
         return redirect('home')
@@ -60,7 +62,7 @@ def register(request):
      return render(request,'accounts/register.html',context)
     
      
-
+@csrf_exempt
 def login(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -98,7 +100,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request,'Invalid activation')
         return redirect('register')    
-
+@csrf_exempt
 def forgotPassword(request):
     if request.method == 'POST':
         email = request.POST['email']
